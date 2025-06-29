@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="movies_list_popular_movies">Popular Movies</string>
+    <string name="movies_list_top_rated_movies">Top Rated Movies</string>
+    <string name="movies_list_upcoming_movies">Upcoming Movies</string>
+    <string name="screen_title_movie_detail">Movie detail</string>
+    <string name="movie_detail_watch_trailer">Watch trailer</string>
+</resources>

@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.leo.movies.LocalUrlLauncher
 import com.leo.movies.domain.model.Movie
 import com.leo.movies.ui.components.CastMemberItem
 import com.leo.movies.ui.components.MovieGenreChip
@@ -51,8 +54,10 @@ import compose.icons.fontawesomeicons.solid.Clock
 import compose.icons.fontawesomeicons.solid.Play
 import compose.icons.fontawesomeicons.solid.Star
 import movies.composeapp.generated.resources.Res
+import movies.composeapp.generated.resources.alert_title_sorry
 import movies.composeapp.generated.resources.movie_detail_watch_trailer
 import movies.composeapp.generated.resources.screen_title_movie_detail
+import movies.composeapp.generated.resources.video_not_found
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -62,10 +67,40 @@ fun MovieDetailRoute(
     navigateBack: () -> Unit,
 ) {
     val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
+    val videoState by viewModel.videoState.collectAsStateWithLifecycle()
+
+    if (videoState is MovieDetailViewModel.VideoState.Error) {
+        AlertDialog(
+            onDismissRequest = viewModel::clearVideoState,
+            confirmButton = {
+                Button(onClick = { viewModel.clearVideoState() }) {
+                    Text("OK")
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(Res.string.alert_title_sorry)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(Res.string.video_not_found)
+                )
+            }
+        )
+    }
+
+    if (videoState is MovieDetailViewModel.VideoState.Success && videoState != null) {
+        LocalUrlLauncher.current.open((videoState as MovieDetailViewModel.VideoState.Success).url)
+        viewModel.clearVideoState()
+    }
+
 
     MovieDetailScreen(
         movieDetailState = movieDetailState,
-        onNavigationIconClick = navigateBack
+        videoState = videoState,
+        onNavigationIconClick = navigateBack,
+        onVideoClick = viewModel::video
     )
 }
 
@@ -73,7 +108,9 @@ fun MovieDetailRoute(
 @Composable
 fun MovieDetailScreen(
     movieDetailState: MovieDetailViewModel.MovieDetailState,
-    onNavigationIconClick: () -> Unit
+    videoState: MovieDetailViewModel.VideoState?,
+    onNavigationIconClick: () -> Unit,
+    onVideoClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -120,7 +157,9 @@ fun MovieDetailScreen(
 
                 is MovieDetailViewModel.MovieDetailState.Success -> {
                     MovieDetailContent(
-                        movie = movieDetailState.movie
+                        movie = movieDetailState.movie,
+                        videoState = videoState,
+                        onVideoClick = onVideoClick
                     )
                 }
 
@@ -138,8 +177,10 @@ fun MovieDetailScreen(
 
 @Composable
 fun MovieDetailContent(
+    movie: Movie,
+    videoState: MovieDetailViewModel.VideoState?,
     modifier: Modifier = Modifier,
-    movie: Movie
+    onVideoClick: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -229,9 +270,7 @@ fun MovieDetailContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             ElevatedButton(
-                onClick = {
-
-                },
+                onClick = onVideoClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
@@ -250,6 +289,14 @@ fun MovieDetailContent(
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodyMedium
                 )
+
+                if (videoState is MovieDetailViewModel.VideoState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .padding(start = 16.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

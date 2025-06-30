@@ -12,8 +12,12 @@ import com.leo.movies.navigation.AppRoutes
 import com.leo.movies.ui.moviedetail.MovieDetailRoute
 import com.leo.movies.ui.movies.MoviesListRoute
 import com.leo.movies.ui.theme.MoviesAppTheme
+import com.leo.movies.utils.OpenYoutube
 import org.koin.compose.KoinApplication
 
+val LocalUrlLauncher = staticCompositionLocalOf<OpenYoutube> {
+    error("No app to open")
+}
 
 @Composable
 @Preview

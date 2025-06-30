@@ -5,4 +5,6 @@
     <string name="movies_list_upcoming_movies">Próximos lançamentos</string>
     <string name="screen_title_movie_detail">Detalhes do filme</string>
     <string name="movie_detail_watch_trailer">Assistir trailer</string>
+    <string name="video_not_found">Trailer não está disponível</string>
+    <string name="alert_title_sorry">Eita...</string>
 </resources>

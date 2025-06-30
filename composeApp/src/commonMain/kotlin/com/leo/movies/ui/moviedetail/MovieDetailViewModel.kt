@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import androidx.savedstate.SavedState
 import com.leo.movies.data.repository.MoviesRepository
 import com.leo.movies.domain.model.Movie
 import com.leo.movies.navigation.AppRoutes
@@ -22,6 +21,9 @@ class MovieDetailViewModel(
 
     private val _movieDetailState = MutableStateFlow<MovieDetailState>(MovieDetailState.Loading)
     val movieDetailState = _movieDetailState.asStateFlow()
+
+    private val _videoState = MutableStateFlow<VideoState?>(null)
+    val videoState = _videoState.asStateFlow()
 
     init {
         getMovieDetail()
@@ -44,9 +46,38 @@ class MovieDetailViewModel(
         }
     }
 
+    fun clearVideoState() {
+        _videoState.update { null }
+    }
+
+    fun video() {
+        viewModelScope.launch {
+            _videoState.update { VideoState.Loading }
+
+            moviesRepository.getVideos(movieDetailRoute.id).fold(
+                onSuccess = { video ->
+                    _videoState.update {
+                        VideoState.Success(video.url)
+                    }
+                },
+                onFailure = { error ->
+                    _videoState.update {
+                        VideoState.Error(error.message ?: "Unknown error")
+                    }
+                }
+            )
+        }
+    }
+
     sealed interface MovieDetailState {
         data object Loading : MovieDetailState
         data class Success(val movie: Movie) : MovieDetailState
         data class Error(val message: String) : MovieDetailState
+    }
+
+    sealed interface VideoState {
+        data object Loading : VideoState
+        data class Success(val url: String) : VideoState
+        data class Error(val message: String) : VideoState
     }
 }

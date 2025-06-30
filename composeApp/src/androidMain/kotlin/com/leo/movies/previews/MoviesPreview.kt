@@ -52,7 +52,9 @@ fun MoviesDetailScreenPreview() {
     MoviesAppTheme {
         MovieDetailScreen(
             movieDetailState = MovieDetailViewModel.MovieDetailState.Success(movie1),
-            onNavigationIconClick = {}
+            onNavigationIconClick = {},
+            videoState = MovieDetailViewModel.VideoState.Loading,
+            onVideoClick = {}
         )
     }
 }

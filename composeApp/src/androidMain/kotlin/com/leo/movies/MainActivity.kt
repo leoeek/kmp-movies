@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowInsetsControllerCompat
+import com.leo.movies.utils.OpenYoutube
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +22,11 @@ class MainActivity : ComponentActivity() {
             SideEffect {
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = false
             }
-            App()
+            CompositionLocalProvider(
+                LocalUrlLauncher provides OpenYoutube(this)
+            ) {
+                App()
+            }
         }
     }
 }

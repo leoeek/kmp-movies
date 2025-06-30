@@ -5,4 +5,6 @@
     <string name="movies_list_upcoming_movies">Upcoming Movies</string>
     <string name="screen_title_movie_detail">Movie detail</string>
     <string name="movie_detail_watch_trailer">Watch trailer</string>
+    <string name="video_not_found">Video not found</string>
+    <string name="alert_title_sorry">Oops...</string>
 </resources>

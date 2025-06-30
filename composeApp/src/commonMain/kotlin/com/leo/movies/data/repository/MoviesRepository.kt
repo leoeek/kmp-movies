@@ -5,6 +5,8 @@ import com.leo.movies.data.network.KtorClient
 import com.leo.movies.domain.model.ImageSize
 import com.leo.movies.domain.model.Movie
 import com.leo.movies.domain.model.MovieSection
+import com.leo.movies.domain.model.Video
+import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -63,6 +65,16 @@ class MoviesRepository(
                     castMembersResponse = creditsResponse.cast,
                     imageSize = ImageSize.X_LARGE,
                 )
+            }
+        }
+    }
+
+    suspend fun getVideos(movieId: Int): Result<Video> {
+        return withContext(ioDispatcher) {
+            runCatching {
+                val videoDeferred = async { ktorClient.getVideos(movieId) }
+                val videosResponse = videoDeferred.await()
+                videosResponse.toModel()
             }
         }
     }

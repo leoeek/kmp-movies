@@ -3,6 +3,7 @@ package com.leo.movies.data.network
 import com.leo.movies.data.network.model.CreditsListResponse
 import com.leo.movies.data.network.model.MovieResponse
 import com.leo.movies.data.network.model.MoviesListResponse
+import com.leo.movies.data.network.model.VideosListResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.auth.Auth
@@ -22,7 +23,7 @@ import kotlinx.serialization.json.Json
 
 private const val BASE_URL = "https://api.themoviedb.org"
 const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p"
-private const val TOKEN = "SEU TOKEN AQUI"
+private const val TOKEN = "TOKEN AQUI"
 
 class KtorClient {
 
@@ -77,6 +78,12 @@ class KtorClient {
 
     suspend fun getCredits(movieId: Int): CreditsListResponse {
         return client.get("$BASE_URL/3/movie/$movieId/credits") {
+            this.addLanguageParam()
+        }.body()
+    }
+
+    suspend fun getVideos(movieId: Int): VideosListResponse {
+        return client.get("$BASE_URL/3/movie/$movieId/videos") {
             this.addLanguageParam()
         }.body()
     }
